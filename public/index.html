@@ -85,27 +85,41 @@
     
 
     </div>
-   
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          const userForm = document.getElementById('userForm');
-          userForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(userForm);
-            const res = await fetch('/api/submit', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(Object.fromEntries(formData)),
-            });
-        
-            if (res.ok) {
-              document.getElementById('confirmationDiv').style.display = 'block';
-            }
-          });
-        });
+    
+<!-- Below Fold Ad Script from Adsense -->
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8669504852140174"
+    crossorigin="anonymous"></script>
+        <!-- Below fold ad -->
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-8669504852140174"
+            data-ad-slot="6462311776"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
         </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                const userForm = document.getElementById('userForm');
+                userForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(userForm);
+                    const res = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData)),
+                    });
+                
+                    if (res.ok) {
+                    document.getElementById('confirmationDiv').style.display = 'block';
+                    }
+                });
+                });
+                </script>
 </body>
 
 </html>
