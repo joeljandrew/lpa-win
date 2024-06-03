@@ -20,21 +20,32 @@
             margin-top: 20px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
     <h1>Live Generative Audio Stream</h1>
-    <button onclick="document.getElementById('player').style.display='block'; this.style.display='none';">Generate Music</button>
+    <button onclick="document.getElementById('player').style.display='block'; this.style.display='none'; initPlayer();">Generate Music</button>
     <div id="player">
-        <audio id="audioPlayer" controls>
-            <source src="http://10.0.0.58:8080/hls/mystream.m3u8" type="application/x-mpegURL">
-            Your browser does not support the audio element.
-        </audio>
+        <audio id="audioPlayer" controls></audio>
     </div>
 
     <script>
-        document.getElementById('audioPlayer').addEventListener('canplay', function() {
-            this.play();
-        });
+        function initPlayer() {
+            var audio = document.getElementById('audioPlayer');
+            if (Hls.isSupported()) {
+                var hls = new Hls();
+                hls.loadSource('http://10.0.0.58:8080/hls/mystream.m3u8');
+                hls.attachMedia(audio);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    audio.play();
+                });
+            } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+                audio.src = 'http://10.0.0.58:8080/hls/mystream.m3u8';
+                audio.addEventListener('canplay', function() {
+                    audio.play();
+                });
+            }
+        }
     </script>
 </body>
 </html>
