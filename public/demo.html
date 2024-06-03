@@ -1,57 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Audio Stream</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-</head>
-<body>
-    <h1>Live Audio Stream</h1>
-    <div id="player">
-        <audio id="audioPlayer" controls></audio>
-    </div>
+worker_processes  1;
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var audio = document.getElementById('audioPlayer');
-            if (Hls.isSupported()) {
-                var hls = new Hls();
-                hls.loadSource('https://www.licenseplateanonymous.com/hls/mystream.m3u8');
-                hls.attachMedia(audio);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    audio.play();
-                });
-                hls.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        switch(data.type) {
-                            case Hls.ErrorTypes.NETWORK_ERROR:
-                                console.error("A network error occurred:", data);
-                                break;
-                            case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.error("A media error occurred:", data);
-                                break;
-                            default:
-                                console.error("An unrecoverable error occurred:", data);
-                                hls.destroy();
-                                break;
-                        }
-                    }
-                });
-            } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-                audio.src = 'https://www.licenseplateanonymous.com/hls/mystream.m3u8';
-                audio.addEventListener('canplay', function() {
-                    audio.play();
-                });
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       8080;
+        server_name  localhost;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        location /hls {
+            types {
+                application/vnd.apple.mpegurl m3u8;
+                video/mp2t ts;
             }
-        });
-    </script>
-</body>
-</html>
+            root C:/nginx;
+            add_header Cache-Control no-cache;
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Credentials' 'true';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+            add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
+        }
+    }
+}
+
+rtmp {
+    server {
+        listen 1935;
+        chunk_size 4096;
+
+        application live {
+            live on;
+            record off;
+            hls on;
+            hls_path C:/nginx/hls;
+            hls_fragment 3;
+        }
+    }
+}
